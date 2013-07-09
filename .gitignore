@@ -14,7 +14,7 @@ Thumbs.db
 /bin/*
 /flashsource/*
 /libs/*
-/sample/*.swf
+/test/*.swf
 
 .swf
 .txt
