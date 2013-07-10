@@ -15,6 +15,14 @@ public class TiledMap extends Sprite
 	private var nodeList:Dictionary;
 	//显示范围
 	private var viewPort:Rectangle;
+	//当前最大行数
+	private var rowMax:int;
+	//当前最小行数
+	private var rowMin:int;
+	//当前最大列数
+	private var columnMax:int;
+	//当前最小列数
+	private var columnMin:int;
 	/**
 	 * 地图格子类
 	 * @param	viewPort	显示范围
@@ -32,22 +40,37 @@ public class TiledMap extends Sprite
 	private function initData():void 
 	{
 		this.nodeList = new Dictionary();
+		//行
+		this.rowMin = 0;
+		this.rowMax = 4;
+		//列
+		this.columnMin = 0;
+		this.columnMax = 4;
 		var node:NodeVo;
 		var txt:TextField;
-		for (var i:int = 0; i < 5; i++) 
+		for (var i:int = this.columnMin; i <= this.columnMax; i += 1)
 		{
-			for (var j:int = 0; j < 5; j++) 
+			//列
+			for (var j:int = this.rowMin; j <= this.rowMax; j += 1)
 			{
+				//行
 				node = new NodeVo();
 				node.backBg = new Image();
 				node.backBg.mouseEnabled = false;
 				node.backBg.mouseChildren = false;
 				txt = node.backBg.getChildByName("posTxt") as TextField;
-				txt.text = i + "_" + j;
-				node.row = i;
-				node.column = j;
-				node.backBg.x = node.row * node.backBg.width;
-				node.backBg.y = node.column * node.backBg.height;
+				txt.text = j + "_" + i + "\n行= " + j + "\n列= " + i;
+				node.row = j;
+				node.column = i;
+				//计算出上下左右的行列索引
+				if (j > this.rowMin) node.upRow = j - 1;
+				else if (j < this.rowMax) node.downRow = j + 1;
+				
+				if (i > this.columnMin) node.leftColumn = i - 1;
+				else if (i < this.columnMax) node.rightColumn = i + 1;
+				
+				node.move(node.column * node.backBg.width, 
+						  node.row * node.backBg.height);
 				this.addChild(node.backBg);
 				this.nodeList[i + "_" + j] = node;
 			}
@@ -58,14 +81,27 @@ public class TiledMap extends Sprite
 	}
 	
 	/**
+	 * 更新节点数据
+	 */
+	public function update():void
+	{
+		var node:NodeVo;
+		for each (node in this.nodeList) 
+		{
+			node.x += 5;
+			
+		}
+	}
+	
+	/**
 	 * 根据 行列获取节点数据
-	 * @param	row		行
 	 * @param	column	列
+	 * @param	row		行
 	 * @return	节点数据
 	 */
-	public function getNode(row:int, column:int):NodeVo
+	public function getNode(column:int, row:int):NodeVo
 	{
-		return this.nodeList[row + "_" + column];
+		return this.nodeList[column + "_" + row];
 	}
 	
 	/**
@@ -75,9 +111,9 @@ public class TiledMap extends Sprite
 	 */
 	public function getNodeByPostion(x:Number, y:Number):NodeVo
 	{
-		var row:int = Math.floor(x / NodeVo.WIDTH);
-		var column:int = Math.floor(y / NodeVo.HEIGHT);
-		return this.getNode(row, column);
+		var row:int = Math.floor(y / NodeVo.HEIGHT);
+		var column:int = Math.floor(x / NodeVo.WIDTH);
+		return this.getNode(column, row);
 	}
 	
 	/**
