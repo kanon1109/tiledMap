@@ -64,10 +64,10 @@ public class TiledMap extends Sprite
 				node.column = i;
 				//计算出上下左右的行列索引
 				if (j > this.rowMin) node.upRow = j - 1;
-				else if (j < this.rowMax) node.downRow = j + 1;
+				if (j < this.rowMax) node.downRow = j + 1;
 				
 				if (i > this.columnMin) node.leftColumn = i - 1;
-				else if (i < this.columnMax) node.rightColumn = i + 1;
+				if (i < this.columnMax) node.rightColumn = i + 1;
 				
 				node.move(node.column * node.backBg.width, 
 						  node.row * node.backBg.height);
