@@ -19,15 +19,26 @@ public class Test extends Sprite
 		this.localPos = new Point();
 		this.globalPos = new Point();
 		this.tiledMap = new TiledMap(stage);
-		this.tiledMap.addEventListener(MouseEvent.CLICK , clickHandler);
+		//this.tiledMap.addEventListener(MouseEvent.CLICK , clickHandler);
+		stage.addEventListener(MouseEvent.MOUSE_DOWN , mouseDownHandler);
+		stage.addEventListener(MouseEvent.MOUSE_UP , mouseUpHandler);
 		this.addChild(this.tiledMap);
-		
 		this.addEventListener(Event.ENTER_FRAME, loop);
+	}
+	
+	private function mouseUpHandler(event:MouseEvent):void 
+	{
+		this.tiledMap.stopTiledDrag();
+	}
+	
+	private function mouseDownHandler(event:MouseEvent):void 
+	{
+		this.tiledMap.startTiledDrag();
 	}
 	
 	private function loop(event:Event):void 
 	{
-		//this.tiledMap.update();
+		this.tiledMap.update();
 	}
 	
 	private function clickHandler(event:MouseEvent):void 
@@ -36,9 +47,6 @@ public class Test extends Sprite
 		this.globalPos.y = event.stageY;
 		this.localPos = this.globalToLocal(this.globalPos);
 		var node:NodeVo = this.tiledMap.getNodeByPostion(this.localPos.x, this.localPos.y);
-		trace(node.row, node.column);
-		trace("上行",node.upRow, "下行",  node.downRow);
-		trace("左列", node.leftColumn, "右列",  node.rightColumn);
 	}
 	
 }

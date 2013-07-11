@@ -23,6 +23,11 @@ public class TiledMap extends Sprite
 	private var columnMax:int;
 	//当前最小列数
 	private var columnMin:int;
+	//是否在拖动状态
+	private var isDrag:Boolean;
+	//上一次鼠标位置
+	private var prevMouseX:Number;
+	private var prevMouseY:Number;
 	/**
 	 * 地图格子类
 	 * @param	viewPort	显示范围
@@ -62,6 +67,21 @@ public class TiledMap extends Sprite
 				txt.text = j + "_" + i + "\n行= " + j + "\n列= " + i;
 				node.row = j;
 				node.column = i;
+				
+				//第一列
+				if (i == this.columnMin)
+					node.leftColumn = this.columnMax;
+				//最后一列
+				if (i == this.columnMax)
+					node.rightColumn = this.columnMin;
+				
+				//第一行
+				if (j == this.rowMin)
+					node.upRow = this.rowMax;
+				//最后一行
+				if (j == this.rowMax)
+					node.downRow = this.rowMin;
+				
 				//计算出上下左右的行列索引
 				if (j > this.rowMin) node.upRow = j - 1;
 				if (j < this.rowMax) node.downRow = j + 1;
@@ -88,9 +108,103 @@ public class TiledMap extends Sprite
 		var node:NodeVo;
 		for each (node in this.nodeList) 
 		{
-			node.x += 5;
-			
+			this.checkRange(node);
+			this.drag(node);
 		}
+		if (this.isDrag)
+		{
+			this.prevMouseX = this.mouseX;
+			this.prevMouseY = this.mouseY;
+		}
+	}
+	
+	
+	/**
+	 * 拖动
+	 * @param	node	当前节点
+	 */
+	private function drag(node:NodeVo):void
+	{
+		if (this.isDrag)
+		{
+			node.x += this.mouseX - this.prevMouseX;
+			node.y += this.mouseY - this.prevMouseY;
+		}
+	}
+	
+	/**
+	 * 判断移动范围
+	 * @param	node	当前节点
+	 */
+	private function checkRange(node:NodeVo):void
+	{
+		var lastNode:NodeVo;
+		//相同行节点
+		var sameRowNode:NodeVo;
+		//相同行节点
+		var sameColumnNode:NodeVo;
+		var i:int;
+		//左右越界判断
+		if (node.x + NodeVo.WIDTH < this.viewPort.left)
+		{
+			lastNode = this.getNode(node.leftColumn, node.row);
+			node.x = lastNode.x + NodeVo.WIDTH;
+			for (i = this.rowMin; i <= this.rowMax; i += 1)
+			{
+				sameRowNode = this.getNode(node.column, i);
+				sameRowNode.x = node.x;
+			}
+		}
+		else if (node.x > this.viewPort.right)
+		{
+			lastNode = this.getNode(node.rightColumn, node.row);
+			node.x = lastNode.x - NodeVo.WIDTH;
+			for (i = this.rowMin; i <= this.rowMax; i += 1)
+			{
+				sameRowNode = this.getNode(node.column, i);
+				sameRowNode.x = node.x;
+			}
+		}
+		
+		//上下越界判断
+		if (node.y + NodeVo.HEIGHT < this.viewPort.top)
+		{
+			lastNode = this.getNode(node.column, node.upRow);
+			node.y = lastNode.y + NodeVo.HEIGHT;
+			for (i = this.columnMin; i <= this.columnMax; i += 1)
+			{
+				sameColumnNode = this.getNode(i, node.row);
+				sameColumnNode.y = node.y;
+			}
+		}
+		else if (node.y > this.viewPort.bottom)
+		{
+			lastNode = this.getNode(node.column, node.downRow);
+			node.y = lastNode.y - NodeVo.HEIGHT;
+			for (i = this.columnMin; i <= this.columnMax; i += 1)
+			{
+				sameColumnNode = this.getNode(i, node.row);
+				sameColumnNode.y = node.y;
+			}
+		}
+	}
+	
+	/**
+	 * 拖拽
+	 */
+	public function startTiledDrag():void
+	{
+		this.isDrag = true;
+		this.prevMouseX = this.mouseX;
+		this.prevMouseY = this.mouseY;
+	}
+	
+	/**
+	 * 停止拖动
+	 */
+	public function stopTiledDrag():void
+	{
+		this.isDrag = false;
 	}
 	
 	/**
@@ -114,14 +228,6 @@ public class TiledMap extends Sprite
 		var row:int = Math.floor(y / NodeVo.HEIGHT);
 		var column:int = Math.floor(x / NodeVo.WIDTH);
 		return this.getNode(column, row);
-	}
-	
-	/**
-	 * 渲染
-	 */
-	public function render():void
-	{
-		
 	}
 }
 }
