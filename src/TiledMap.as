@@ -47,10 +47,10 @@ public class TiledMap extends Sprite
 		this.nodeList = new Dictionary();
 		//行
 		this.rowMin = 0;
-		this.rowMax = 4;
+		this.rowMax = 5;
 		//列
 		this.columnMin = 0;
-		this.columnMax = 4;
+		this.columnMax = 5;
 		var node:NodeVo;
 		var txt:TextField;
 		for (var i:int = this.columnMin; i <= this.columnMax; i += 1)
@@ -82,12 +82,12 @@ public class TiledMap extends Sprite
 				if (j == this.rowMax)
 					node.downRow = this.rowMin;
 				
-				//计算出上下左右的行列索引
+				/*//计算出上下左右的行列索引
 				if (j > this.rowMin) node.upRow = j - 1;
 				if (j < this.rowMax) node.downRow = j + 1;
 				
 				if (i > this.columnMin) node.leftColumn = i - 1;
-				if (i < this.columnMax) node.rightColumn = i + 1;
+				if (i < this.columnMax) node.rightColumn = i + 1;*/
 				
 				node.move(node.column * node.backBg.width, 
 						  node.row * node.backBg.height);
@@ -138,54 +138,14 @@ public class TiledMap extends Sprite
 	 */
 	private function checkRange(node:NodeVo):void
 	{
-		var lastNode:NodeVo;
-		//相同行节点
-		var sameRowNode:NodeVo;
-		//相同行节点
-		var sameColumnNode:NodeVo;
-		var i:int;
-		//左右越界判断
-		if (node.x + NodeVo.WIDTH < this.viewPort.left)
+		//左右越界判断 上下越界判断
+		if (node.x + NodeVo.WIDTH < this.viewPort.left ||
+			node.y + NodeVo.HEIGHT < this.viewPort.top ||
+			node.x > this.viewPort.right ||
+			node.y > this.viewPort.bottom)
 		{
-			lastNode = this.getNode(node.leftColumn, node.row);
-			node.x = lastNode.x + NodeVo.WIDTH;
-			for (i = this.rowMin; i <= this.rowMax; i += 1)
-			{
-				sameRowNode = this.getNode(node.column, i);
-				sameRowNode.x = node.x;
-			}
-		}
-		else if (node.x > this.viewPort.right)
-		{
-			lastNode = this.getNode(node.rightColumn, node.row);
-			node.x = lastNode.x - NodeVo.WIDTH;
-			for (i = this.rowMin; i <= this.rowMax; i += 1)
-			{
-				sameRowNode = this.getNode(node.column, i);
-				sameRowNode.x = node.x;
-			}
-		}
-		
-		//上下越界判断
-		if (node.y + NodeVo.HEIGHT < this.viewPort.top)
-		{
-			lastNode = this.getNode(node.column, node.upRow);
-			node.y = lastNode.y + NodeVo.HEIGHT;
-			for (i = this.columnMin; i <= this.columnMax; i += 1)
-			{
-				sameColumnNode = this.getNode(i, node.row);
-				sameColumnNode.y = node.y;
-			}
-		}
-		else if (node.y > this.viewPort.bottom)
-		{
-			lastNode = this.getNode(node.column, node.downRow);
-			node.y = lastNode.y - NodeVo.HEIGHT;
-			for (i = this.columnMin; i <= this.columnMax; i += 1)
-			{
-				sameColumnNode = this.getNode(i, node.row);
-				sameColumnNode.y = node.y;
-			}
+			node.removeFromParent();
+			delete this.nodeList[node];
 		}
 	}
 	

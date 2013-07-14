@@ -31,6 +31,7 @@ public class NodeVo
 	public var leftColumn:int = -1;
 	/*右列*/
 	public var rightColumn:int = -1;
+	
 	/**
 	 * 移动
 	 * @param	x
@@ -62,6 +63,16 @@ public class NodeVo
 	{
 		_y = value;
 		this.backBg.y = _y;
+	}
+	
+	/**
+	 * 销毁自己
+	 */
+	public function removeFromParent():void
+	{
+		if (this.backBg && 
+			this.backBg.parent)
+			this.backBg.parent.removeChild(this.backBg);
 	}
 	
 	/**
