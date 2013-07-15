@@ -18,13 +18,12 @@ public class Test extends Sprite
 	{
 		this.localPos = new Point();
 		this.globalPos = new Point();
-		this.tiledMap = new TiledMap(stage);
-		
-		stage.addEventListener(MouseEvent.MOUSE_DOWN , mouseDownHandler);
-		stage.addEventListener(MouseEvent.MOUSE_UP , mouseUpHandler);
+		this.tiledMap = new TiledMap(4, 4, 100, 80);
 		this.addChild(this.tiledMap);
 		this.addEventListener(Event.ENTER_FRAME, loop);
 		this.addChild(new Stats());
+		stage.addEventListener(MouseEvent.MOUSE_DOWN , mouseDownHandler);
+		stage.addEventListener(MouseEvent.MOUSE_UP , mouseUpHandler);
 	}
 	
 	private function mouseUpHandler(event:MouseEvent):void 
@@ -47,7 +46,6 @@ public class Test extends Sprite
 		this.globalPos.x = event.stageX;
 		this.globalPos.y = event.stageY;
 		this.localPos = this.globalToLocal(this.globalPos);
-		var node:NodeVo = this.tiledMap.getNodeByPostion(this.localPos.x, this.localPos.y);
 	}
 	
 }

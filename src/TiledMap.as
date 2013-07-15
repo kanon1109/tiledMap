@@ -13,90 +13,69 @@ public class TiledMap extends Sprite
 {
 	//节点字典
 	private var nodeList:Dictionary;
-	//显示范围
-	private var viewPort:Rectangle;
 	//当前最大行数
-	private var rowMax:int;
-	//当前最小行数
-	private var rowMin:int;
+	private var row:int;
 	//当前最大列数
-	private var columnMax:int;
-	//当前最小列数
-	private var columnMin:int;
+	private var column:int;
 	//是否在拖动状态
 	private var isDrag:Boolean;
-	//上一次鼠标位置
+	//上一次鼠标x位置
 	private var prevMouseX:Number;
+	//上一次鼠标y位置
 	private var prevMouseY:Number;
+	//结点宽
+	private var nodeWidth:Number;
+	//结点高
+	private var nodeHeight:Number;
+	//结点的边界
+	private var side:Rectangle;
 	/**
 	 * 地图格子类
-	 * @param	viewPort	显示范围
 	 */
-	public function TiledMap(stage:Stage, viewPort:Rectangle = null) 
+	public function TiledMap(row:int, column:int, nodeWidth:int = 100, nodeHeight:int = 100) 
 	{
-		if (!viewPort) viewPort = new Rectangle(0, 0, stage.stageWidth, stage.stageHeight);
-		this.viewPort = viewPort;
-		this.initData();
+		//行
+		this.row = row;
+		//列
+		this.column = row;
+		//结点列表
+		this.nodeList = new Dictionary();
+		//结点宽
+		this.nodeWidth = nodeWidth;
+		//结点高
+		this.nodeHeight = nodeHeight;
+		//边界
+		this.side = new Rectangle(0, 0, this.column * this.nodeWidth, this.row * this.nodeHeight);
+		//初始化结点
+		this.initNode();
 	}
 	
 	/**
-	 * 初始化数据
+	 * 初始化结点
 	 */
-	private function initData():void 
+	private function initNode():void 
 	{
-		this.nodeList = new Dictionary();
-		//行
-		this.rowMin = 0;
-		this.rowMax = 6;
-		//列
-		this.columnMin = 0;
-		this.columnMax = 6;
-		var node:NodeVo;
+		var node:Node;
 		var txt:TextField;
-		for (var i:int = this.columnMin; i <= this.columnMax; i += 1)
+		//行数
+		for (var i:int = 0; i < this.row; i += 1)
 		{
-			//列
-			for (var j:int = this.rowMin; j <= this.rowMax; j += 1)
+			//列数
+			for (var j:int = 0; j < this.column; j += 1) 
 			{
-				//行
-				node = new NodeVo();
+				node = new Node(this.side);
 				node.backBg = new Image();
-				node.backBg.mouseEnabled = false;
-				node.backBg.mouseChildren = false;
-				txt = node.backBg.getChildByName("posTxt") as TextField;
-				txt.text = j + "_" + i + "\n行= " + j + "\n列= " + i;
-				node.row = j;
-				node.column = i;
-				
-				//第一列
-				if (i == this.columnMin)
-					node.leftColumn = this.columnMax;
-				//最后一列
-				if (i == this.columnMax)
-					node.rightColumn = this.columnMin;
-				
-				//第一行
-				if (j == this.rowMin)
-					node.upRow = this.rowMax;
-				//最后一行
-				if (j == this.rowMax)
-					node.downRow = this.rowMin;
-				
-				//计算出上下左右的行列索引
-				if (j > this.rowMin) node.upRow = j - 1;
-				if (j < this.rowMax) node.downRow = j + 1;
-				
-				if (i > this.columnMin) node.leftColumn = i - 1;
-				if (i < this.columnMax) node.rightColumn = i + 1;
-				
-				node.move(node.column * node.backBg.width, node.row * node.backBg.height);
+				node.x = node.nextX = node.backBg.width * j;
+				node.y = node.nextY = node.backBg.height * i;
+				//以列数为key存放 行数列表
+				if (!this.nodeList[i]) this.nodeList[i] = [];
+				this.nodeList[i].push(node);
 				this.addChild(node.backBg);
-				this.nodeList[i + "_" + j] = node;
 			}
 		}
 		//和默认底板的高宽一致
-		NodeVo.WIDTH = node.backBg.width;
-		NodeVo.HEIGHT = node.backBg.height;
+		Node.WIDTH = node.backBg.width;
+		Node.HEIGHT = node.backBg.height;
 	}
 	
 	/**
@@ -104,11 +83,17 @@ public class TiledMap extends Sprite
 	 */
 	public function update():void
 	{
-		var node:NodeVo;
-		for each (node in this.nodeList) 
+		var rowArr:Array;
+		var node:Node;
+		for each (rowArr in this.nodeList) 
 		{
-			this.checkRange(node);
-			this.drag(node);
+			var length:int = rowArr.length;
+			for (var i:int = 0; i < length; i += 1) 
+			{
+				node = rowArr[i];
+				node.update();
+				this.drag(node);
+			}
 		}
 		if (this.isDrag)
 		{
@@ -117,74 +102,16 @@ public class TiledMap extends Sprite
 		}
 	}
 	
-	
 	/**
 	 * 拖动
 	 * @param	node	当前节点
 	 */
-	private function drag(node:NodeVo):void
+	private function drag(node:Node):void
 	{
 		if (this.isDrag)
 		{
-			node.x += this.mouseX - this.prevMouseX;
-			node.y += this.mouseY - this.prevMouseY;
-		}
-	}
-	
-	/**
-	 * 判断移动范围
-	 * @param	node	当前节点
-	 */
-	private function checkRange(node:NodeVo):void
-	{
-		var lastNode:NodeVo;
-		//相同行节点
-		var sameRowNode:NodeVo;
-		//相同行节点
-		var sameColumnNode:NodeVo;
-		var i:int;
-		//左右越界判断
-		if (node.x + NodeVo.WIDTH < this.viewPort.left)
-		{
-			lastNode = this.getNode(node.leftColumn, node.row);
-			node.x = lastNode.x + NodeVo.WIDTH;
-			for (i = this.rowMin; i <= this.rowMax; i += 1)
-			{
-				sameRowNode = this.getNode(node.column, i);
-				sameRowNode.x = node.x;
-			}
-		}
-		else if (node.x > this.viewPort.right)
-		{
-			lastNode = this.getNode(node.rightColumn, node.row);
-			node.x = lastNode.x - NodeVo.WIDTH;
-			for (i = this.rowMin; i <= this.rowMax; i += 1)
-			{
-				sameRowNode = this.getNode(node.column, i);
-				sameRowNode.x = node.x;
-			}
-		}
-		
-		//上下越界判断
-		if (node.y + NodeVo.HEIGHT < this.viewPort.top)
-		{
-			lastNode = this.getNode(node.column, node.upRow);
-			node.y = lastNode.y + NodeVo.HEIGHT;
-			for (i = this.columnMin; i <= this.columnMax; i += 1)
-			{
-				sameColumnNode = this.getNode(i, node.row);
-				sameColumnNode.y = node.y;
-			}
-		}
-		else if (node.y > this.viewPort.bottom)
-		{
-			lastNode = this.getNode(node.column, node.downRow);
-			node.y = lastNode.y - NodeVo.HEIGHT;
-			for (i = this.columnMin; i <= this.columnMax; i += 1)
-			{
-				sameColumnNode = this.getNode(i, node.row);
-				sameColumnNode.y = node.y;
-			}
+			node.vx = this.mouseX - this.prevMouseX;
+			node.vy = this.mouseY - this.prevMouseY;
 		}
 	}
 	
@@ -212,7 +139,7 @@ public class TiledMap extends Sprite
 	 * @param	row		行
 	 * @return	节点数据
 	 */
-	public function getNode(column:int, row:int):NodeVo
+	public function getNode(column:int, row:int):Node
 	{
 		return this.nodeList[column + "_" + row];
 	}
@@ -222,10 +149,10 @@ public class TiledMap extends Sprite
 	 * @param	x	x坐标
 	 * @param	y	y坐标
 	 */
-	public function getNodeByPostion(x:Number, y:Number):NodeVo
+	public function getNodeByPostion(x:Number, y:Number):Node
 	{
-		var row:int = Math.floor(y / NodeVo.HEIGHT);
-		var column:int = Math.floor(x / NodeVo.WIDTH);
+		var row:int = Math.floor(y / Node.HEIGHT);
+		var column:int = Math.floor(x / Node.WIDTH);
 		return this.getNode(column, row);
 	}
 }
