@@ -4,6 +4,7 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.geom.Point;
+import flash.geom.Rectangle;
 import net.hires.debug.Stats;
 /**
  * ...测试类
@@ -18,7 +19,7 @@ public class Test extends Sprite
 	{
 		this.localPos = new Point();
 		this.globalPos = new Point();
-		this.tiledMap = new TiledMap(4, 4, 100, 80);
+		this.tiledMap = new TiledMap(8, 8, 100, 80, new Rectangle( -100, -80, 800, 640));
 		this.addChild(this.tiledMap);
 		this.addEventListener(Event.ENTER_FRAME, loop);
 		this.addChild(new Stats());
