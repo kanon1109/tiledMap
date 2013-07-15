@@ -4,7 +4,7 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.geom.Point;
-
+import net.hires.debug.Stats;
 /**
  * ...测试类
  * @author Kanon
@@ -19,11 +19,12 @@ public class Test extends Sprite
 		this.localPos = new Point();
 		this.globalPos = new Point();
 		this.tiledMap = new TiledMap(stage);
-		//this.tiledMap.addEventListener(MouseEvent.CLICK , clickHandler);
+		
 		stage.addEventListener(MouseEvent.MOUSE_DOWN , mouseDownHandler);
 		stage.addEventListener(MouseEvent.MOUSE_UP , mouseUpHandler);
 		this.addChild(this.tiledMap);
 		this.addEventListener(Event.ENTER_FRAME, loop);
+		this.addChild(new Stats());
 	}
 	
 	private function mouseUpHandler(event:MouseEvent):void 

@@ -47,10 +47,10 @@ public class TiledMap extends Sprite
 		this.nodeList = new Dictionary();
 		//行
 		this.rowMin = 0;
-		this.rowMax = 4;
+		this.rowMax = 6;
 		//列
 		this.columnMin = 0;
-		this.columnMax = 4;
+		this.columnMax = 6;
 		var node:NodeVo;
 		var txt:TextField;
 		for (var i:int = this.columnMin; i <= this.columnMax; i += 1)
@@ -89,8 +89,7 @@ public class TiledMap extends Sprite
 				if (i > this.columnMin) node.leftColumn = i - 1;
 				if (i < this.columnMax) node.rightColumn = i + 1;
 				
-				node.move(node.column * node.backBg.width, 
-						  node.row * node.backBg.height);
+				node.move(node.column * node.backBg.width, node.row * node.backBg.height);
 				this.addChild(node.backBg);
 				this.nodeList[i + "_" + j] = node;
 			}
