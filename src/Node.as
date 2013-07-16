@@ -10,10 +10,6 @@ public class Node
 {
 	/*底板层*/
 	public var backBg:Sprite;
-	/*节点宽*/ 
-	public static var WIDTH:Number = 0;
-	/*节点高*/
-	public static var HEIGHT:Number = 0;
 	/*x坐标*/
 	public var x:Number = 0;
 	/*y坐标*/
