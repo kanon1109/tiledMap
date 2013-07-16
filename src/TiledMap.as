@@ -27,25 +27,52 @@ public class TiledMap extends Sprite
 	private var nodeWidth:Number;
 	//结点高
 	private var nodeHeight:Number;
-	//结点的边界
+	//内边界
+	private var inSide:Rectangle;
+	//外的边界
+	private var outSide:Rectangle;
+	//内外边界整合后的可视边界
 	private var side:Rectangle;
+	//格子的起始x坐标位置
+	private var startX:Number;
+	//格子的起始y坐标位置
+	private var startY:Number;
 	/**
 	 * 地图格子类
 	 */
-	public function TiledMap(row:int, column:int, nodeWidth:int = 100, nodeHeight:int = 100) 
+	public function TiledMap(startX:Number, startY:Number, row:int, 
+							column:int, nodeWidth:int = 100, 
+							nodeHeight:int = 100, outSide = null)
 	{
 		//行
 		this.row = row;
 		//列
-		this.column = row;
+		this.column = column;
 		//结点列表
 		this.nodeList = new Dictionary();
 		//结点宽
 		this.nodeWidth = nodeWidth;
 		//结点高
 		this.nodeHeight = nodeHeight;
-		//边界
-		this.side = new Rectangle(0, 0, this.column * this.nodeWidth, this.row * this.nodeHeight);
+		//格子的起始x坐标位置
+		this.startX = startX;
+		//格子的起始y坐标位置
+		this.startY = startY;
+		//内边界
+		this.inSide = new Rectangle(this.startX, this.startY, 
+									this.column * this.nodeWidth, 
+									this.row * this.nodeHeight);
+		//外边界
+		this.outSide = outSide;
+		if (outSide) 
+		{
+			var x:Number = Math.max(this.inSide.left, this.outSide.left);
+			var y:Number = Math.max(this.inSide.top, this.outSide.top);
+			var width:Number = Math.min(this.inSide.width, this.outSide.width);
+			var height:Number = Math.min(this.inSide.height, this.outSide.height);
+			this.side = new Rectangle(x, y, width, height);
+		}
+		else this.side = this.inSide;
 		//初始化结点
 		this.initNode();
 	}
@@ -65,17 +92,14 @@ public class TiledMap extends Sprite
 			{
 				node = new Node(this.side);
 				node.backBg = new Image();
-				node.x = node.nextX = node.backBg.width * j;
-				node.y = node.nextY = node.backBg.height * i;
+				node.x = node.nextX = node.backBg.width * j + this.startX;
+				node.y = node.nextY = node.backBg.height * i + this.startY;
 				//以列数为key存放 行数列表
 				if (!this.nodeList[i]) this.nodeList[i] = [];
 				this.nodeList[i].push(node);
 				this.addChild(node.backBg);
 			}
 		}
-		//和默认底板的高宽一致
-		Node.WIDTH = node.backBg.width;
-		Node.HEIGHT = node.backBg.height;
 	}
 	
 	/**
@@ -151,8 +175,8 @@ public class TiledMap extends Sprite
 	 */
 	public function getNodeByPostion(x:Number, y:Number):Node
 	{
-		var row:int = Math.floor(y / Node.HEIGHT);
-		var column:int = Math.floor(x / Node.WIDTH);
+		var row:int = Math.floor(y / this.nodeHeight);
+		var column:int = Math.floor(x / this.nodeWidth);
 		return this.getNode(column, row);
 	}
 }

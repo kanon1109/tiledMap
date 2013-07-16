@@ -10,10 +10,6 @@ public class Node
 {
 	/*底板层*/
 	public var backBg:Sprite;
-	/*节点宽*/ 
-	public static var WIDTH:Number = 0;
-	/*节点高*/
-	public static var HEIGHT:Number = 0;
 	/*x坐标*/
 	public var x:Number = 0;
 	/*y坐标*/
@@ -47,8 +43,8 @@ public class Node
 		if (this.nextX + this.backBg.width < this.side.left  && this.vx < 0) this.nextX += this.side.width;
 		if (this.nextX > this.side.right && this.vx > 0) this.nextX -= this.side.width;
 		
-		if (this.nextY + this.backBg.height < this.side.top && this.vy < 0) this.nextY += this.side.top;
-		if (this.nextY > this.side.bottom && this.vy > 0) this.nextY -= this.side.bottom;
+		if (this.nextY + this.backBg.height < this.side.top && this.vy < 0) this.nextY += this.side.height;
+		if (this.nextY > this.side.bottom && this.vy > 0) this.nextY -= this.side.height;
 		
 		this.backBg.x = this.x = this.nextX;
 		this.backBg.y = this.y = this.nextY;
