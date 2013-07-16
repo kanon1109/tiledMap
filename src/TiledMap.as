@@ -32,7 +32,7 @@ public class TiledMap extends Sprite
 	/**
 	 * 地图格子类
 	 */
-	public function TiledMap(row:int, column:int, nodeWidth:int = 100, nodeHeight:int = 100) 
+	public function TiledMap(row:int, column:int, nodeWidth:int, nodeHeight:int, side:Rectangle) 
 	{
 		//行
 		this.row = row;
@@ -45,7 +45,9 @@ public class TiledMap extends Sprite
 		//结点高
 		this.nodeHeight = nodeHeight;
 		//边界
-		this.side = new Rectangle(0, 0, this.column * this.nodeWidth, this.row * this.nodeHeight);
+		if (!side) this.side = new Rectangle(0, 0, this.column * this.nodeWidth, 
+													this.row * this.nodeHeight);
+		else this.side = side;
 		//初始化结点
 		this.initNode();
 	}
