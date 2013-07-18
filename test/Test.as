@@ -19,7 +19,7 @@ public class Test extends Sprite
 	{
 		this.localPos = new Point();
 		this.globalPos = new Point();
-		this.tiledMap = new TiledMap(100, 80, 3, 4, 100, 80, new Rectangle(0, 0, stage.stageWidth, stage.stageHeight));
+		this.tiledMap = new TiledMap(-100, -80, 10, 8, 100, 80, new Rectangle(0, 0, stage.stageWidth, stage.stageHeight));
 		this.addChild(this.tiledMap);
 		this.addEventListener(Event.ENTER_FRAME, loop);
 		this.addChild(new Stats());

@@ -23,10 +23,13 @@ public class Node
 	/*纵向速度*/
 	public var vy:Number = 0;
 	/*移动范围*/
-	public var side:Rectangle;
-	public function Node(side)
+	public var outSide:Rectangle;
+	/*整个地图的高宽范围*/
+	public var inSide:Rectangle;
+	public function Node(inSide:Rectangle, outSide:Rectangle)
 	{
-		this.side = side;
+		this.inSide = inSide;
+		this.outSide = outSide;
 	}
 	
 	/**
@@ -40,11 +43,11 @@ public class Node
 		this.nextX = this.x + this.vx;
 		this.nextY = this.y + this.vy;
 		
-		if (this.nextX + this.backBg.width < this.side.left  && this.vx < 0) this.nextX += this.side.width;
-		if (this.nextX > this.side.right && this.vx > 0) this.nextX -= this.side.width;
+		if (this.nextX + this.backBg.width < this.outSide.left  && this.vx < 0) this.nextX += this.inSide.width;
+		if (this.nextX > this.outSide.right && this.vx > 0) this.nextX -= this.inSide.width;
 		
-		if (this.nextY + this.backBg.height < this.side.top && this.vy < 0) this.nextY += this.side.height;
-		if (this.nextY > this.side.bottom && this.vy > 0) this.nextY -= this.side.height;
+		if (this.nextY + this.backBg.height < this.outSide.top && this.vy < 0) this.nextY += this.inSide.height;
+		if (this.nextY > this.outSide.bottom && this.vy > 0) this.nextY -= this.inSide.height;
 		
 		this.backBg.x = this.x = this.nextX;
 		this.backBg.y = this.y = this.nextY;

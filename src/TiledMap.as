@@ -64,15 +64,10 @@ public class TiledMap extends Sprite
 									this.row * this.nodeHeight);
 		//外边界
 		this.outSide = outSide;
-		if (outSide) 
-		{
-			var x:Number = Math.max(this.inSide.left, this.outSide.left);
-			var y:Number = Math.max(this.inSide.top, this.outSide.top);
-			var width:Number = Math.min(this.inSide.width, this.outSide.width);
-			var height:Number = Math.min(this.inSide.height, this.outSide.height);
-			this.side = new Rectangle(x, y, width, height);
-		}
-		else this.side = this.inSide;
+		if (!outSide) this.outSide = this.inSide;
+		
+		trace("this.outSide", this.outSide, this.outSide.right);
+		
 		//初始化结点
 		this.initNode();
 	}
@@ -90,10 +85,10 @@ public class TiledMap extends Sprite
 			//列数
 			for (var j:int = 0; j < this.column; j += 1) 
 			{
-				node = new Node(this.side);
+				node = new Node(this.inSide, this.outSide);
 				node.backBg = new Image();
-				node.x = node.nextX = node.backBg.width * j + this.startX;
-				node.y = node.nextY = node.backBg.height * i + this.startY;
+				node.x = node.nextX = this.nodeWidth * j + this.startX;
+				node.y = node.nextY = this.nodeHeight * i + this.startY;
 				//以列数为key存放 行数列表
 				if (!this.nodeList[i]) this.nodeList[i] = [];
 				this.nodeList[i].push(node);
