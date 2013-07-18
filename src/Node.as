@@ -37,8 +37,8 @@ public class Node
 	 */
 	public function update():void
 	{
-		if (Math.abs(this.vx) < .3) this.vx = 0;
-		if (Math.abs(this.vy) < .3) this.vy = 0;
+		if (Math.abs(this.vx) < 1) this.vx = 0;
+		if (Math.abs(this.vy) < 1) this.vy = 0;
 		
 		this.nextX = this.x + this.vx;
 		this.nextY = this.y + this.vy;
