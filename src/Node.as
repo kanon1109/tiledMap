@@ -22,8 +22,6 @@ public class Node
 	public var vx:Number = 0;
 	/*纵向速度*/
 	public var vy:Number = 0;
-	/*摩擦力*/
-	public var friction:Number = .9;
 	/*移动范围*/
 	public var outSide:Rectangle;
 	/*整个地图的高宽范围*/
@@ -39,9 +37,6 @@ public class Node
 	 */
 	public function update():void
 	{
-		this.vx *= this.friction;
-		this.vy *= this.friction;
-		
 		if (Math.abs(this.vx) < .1) this.vx = 0;
 		if (Math.abs(this.vy) < .1) this.vy = 0;
 		

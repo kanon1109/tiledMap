@@ -37,6 +37,8 @@ public class TiledMap extends Sprite
 	private var startX:Number;
 	//格子的起始y坐标位置
 	private var startY:Number;
+	/*摩擦力*/
+	private var _friction:Number = .9;
 	/**
 	 * 地图格子类
 	 */
@@ -104,12 +106,15 @@ public class TiledMap extends Sprite
 	{
 		var rowArr:Array;
 		var node:Node;
+		var length:int;
 		for each (rowArr in this.nodeList) 
 		{
-			var length:int = rowArr.length;
+			length = rowArr.length;
 			for (var i:int = 0; i < length; i += 1) 
 			{
 				node = rowArr[i];
+				node.vx *= this.friction;
+				node.vy *= this.friction;
 				node.update();
 				this.drag(node);
 			}
@@ -173,6 +178,15 @@ public class TiledMap extends Sprite
 		var row:int = Math.floor(y / this.nodeHeight);
 		var column:int = Math.floor(x / this.nodeWidth);
 		return this.getNode(column, row);
+	}
+	
+	/**
+	 * 拖动时的摩擦力
+	 */
+	public function get friction():Number{ return _friction; }
+	public function set friction(value:Number):void 
+	{
+		_friction = value;
 	}
 }
 }
