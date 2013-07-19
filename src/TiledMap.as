@@ -41,6 +41,13 @@ public class TiledMap extends Sprite
 	private var _friction:Number = .9;
 	/**
 	 * 地图格子类
+	 * @param	startX		x坐标起始位置
+	 * @param	startY		y坐标起始位置
+	 * @param	row			行数
+	 * @param	column		列数
+	 * @param	nodeWidth	节点宽度
+	 * @param	nodeHeight	节点高度
+	 * @param	outSide		外部范围 默认为空，如果设置为空则根据节点 行数×节点高度，列数×节点宽度为范围高宽。
 	 */
 	public function TiledMap(startX:Number, startY:Number, row:int, 
 							column:int, nodeWidth:int = 100, 
