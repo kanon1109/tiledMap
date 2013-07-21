@@ -1,7 +1,6 @@
 package  
 {
 import flash.display.Sprite;
-import flash.display.Stage;
 import flash.geom.Rectangle;
 import flash.text.TextField;
 import flash.utils.Dictionary;
@@ -37,10 +36,6 @@ public class TiledMap extends Sprite
 	private var startX:Number;
 	//格子的起始y坐标位置
 	private var startY:Number;
-	//最大节点行数
-	private var rowMax:int;
-	//最大节点列数
-	private var columnMax:int ;
 	/*摩擦力*/
 	private var _friction:Number = .9;
 	/**
@@ -56,7 +51,6 @@ public class TiledMap extends Sprite
 	public function TiledMap(startX:Number, startY:Number, 
 							 row:int, column:int, 
 							 nodeWidth:int = 100, nodeHeight:int = 100, 
-							 rowMax:int = -1, columnMax:int = -1, 
 							 outSide = null)
 	{
 		//行
@@ -73,10 +67,6 @@ public class TiledMap extends Sprite
 		this.startX = startX;
 		//格子的起始y坐标位置
 		this.startY = startY;
-		//最大行数
-		this.rowMax = rowMax;
-		//最大列数
-		this.columnMax = columnMax;
 		//内边界
 		this.inSide = new Rectangle(this.startX, this.startY, 
 									this.column * this.nodeWidth, 
@@ -84,12 +74,6 @@ public class TiledMap extends Sprite
 		//外边界
 		this.outSide = outSide;
 		if (!outSide) this.outSide = this.inSide;
-		
-		//最大行列数不能小于行列数
-		if (this.rowMax < this.row)
-			this.rowMax = this.row;
-		if (this.columnMax < this.column)
-			this.columnMax = this.column;
 		//初始化结点
 		this.initNode();
 	}
@@ -107,8 +91,9 @@ public class TiledMap extends Sprite
 			//列数
 			for (var j:int = 0; j < this.column; j += 1) 
 			{
-				node = new Node(this.inSide, this.outSide, this.rowMax, this.columnMax);
+				node = new Node(this.inSide, this.outSide);
 				node.backBg = new Image();
+				node.imageContainer = new Sprite();
 				node.x = node.nextX = this.nodeWidth * j + this.startX;
 				node.y = node.nextY = this.nodeHeight * i + this.startY;
 				node.row = i;
@@ -117,6 +102,7 @@ public class TiledMap extends Sprite
 				if (!this.nodeList[i]) this.nodeList[i] = [];
 				this.nodeList[i].push(node);
 				this.addChild(node.backBg);
+				this.addChild(node.imageContainer);
 			}
 		}
 	}
@@ -137,27 +123,18 @@ public class TiledMap extends Sprite
 				node = rowArr[i];
 				node.vx *= this.friction;
 				node.vy *= this.friction;
+				if (this.isDrag)
+				{
+					node.vx = this.mouseX - this.prevMouseX;
+					node.vy = this.mouseY - this.prevMouseY;
+				}
 				node.update();
-				this.drag(node);
 			}
 		}
 		if (this.isDrag)
 		{
 			this.prevMouseX = this.mouseX;
 			this.prevMouseY = this.mouseY;
-		}
-	}
-	
-	/**
-	 * 拖动
-	 * @param	node	当前节点
-	 */
-	private function drag(node:Node):void
-	{
-		if (this.isDrag)
-		{
-			node.vx = this.mouseX - this.prevMouseX;
-			node.vy = this.mouseY - this.prevMouseY;
 		}
 	}
 	
@@ -177,29 +154,6 @@ public class TiledMap extends Sprite
 	public function stopTiledDrag():void
 	{
 		this.isDrag = false;
-	}
-	
-	/**
-	 * 根据 行列获取节点数据
-	 * @param	column	列
-	 * @param	row		行
-	 * @return	节点数据
-	 */
-	public function getNode(column:int, row:int):Node
-	{
-		return this.nodeList[column + "_" + row];
-	}
-	
-	/**
-	 * 根据坐标系获取节点
-	 * @param	x	x坐标
-	 * @param	y	y坐标
-	 */
-	public function getNodeByPostion(x:Number, y:Number):Node
-	{
-		var row:int = Math.floor(y / this.nodeHeight);
-		var column:int = Math.floor(x / this.nodeWidth);
-		return this.getNode(column, row);
 	}
 	
 	/**
